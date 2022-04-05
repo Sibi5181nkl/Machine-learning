@@ -1,0 +1,35 @@
+import pandas as pd
+import numpy as np
+df = pd.read_csv("https://raw.githubusercontent.com/nunnarilabs/ml/master/house/kc_house_data.csv")
+import seaborn as sns
+import matplotlib.pyplot as plt
+df.describe()
+plt.figure(figsize=(12,12))
+sns.heatmap(df.corr(), annot=True)
+X = df.drop(['id', 'date', 'price',  'zipcode', 'lat', 'long'], axis=1)
+y = df.price
+from sklearn.model_selection import train_test_split
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.30, random_state=42)
+X.shape, X_train.shape, X_test.shape
+from sklearn.metrics import r2_score, mean_squared_error, mean_absolute_error
+from sklearn.preprocessing import StandardScaler, PolynomialFeatures, MinMaxScaler
+X[['bedrooms', 'sqft_living']].head(1)
+poly = PolynomialFeatures(degree=2)
+poly.fit_transform(X[['bedrooms', 'sqft_living']])[0]
+poly = PolynomialFeatures(degree=3)
+poly.fit_transform(X[['bedrooms', 'sqft_living']])[0]
+poly = PolynomialFeatures(degree=3, include_bias=False)
+X_poly = poly.fit_transform(X)
+poly_model = LinearRegression()
+poly_model.fit(X_poly, y)
+poly_model.score(X_poly, y)
+scalar = StandardScaler()
+X_poly_scale = scalar.fit_transform(X_poly)
+poly_model = LinearRegression()
+poly_model.fit(X_poly_scale, y)
+poly_model.score(X_poly_scale, y)
+from sklearn.pipeline import Pipeline
+Input=[('scaler', StandardScaler()),('polynomial', PolynomialFeatures(degree = 4, include_bias=False)), ('model', LinearRegression())]
+pipe=Pipeline(Input)
+pipe.fit(X,y)
+pipe.score(X,y)
